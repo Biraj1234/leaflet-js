@@ -1,11 +1,24 @@
 //Map Initialization
-var map = L.map("map").setView([27.685198313732105, 85.32034253942389], 21);
+
+var map = L.map("map").setView([0, 0], 13);
 var currentMarker = null;
 //OSM layer
 var osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 });
 osm.addTo(map);
+
+// Get the current location using the Geolocation API
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(function (position) {
+    // Create a marker with the current location and add it to the map
+    var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(map);
+    // Set the view of the map to the current location
+    map.setView([position.coords.latitude, position.coords.longitude], 16);
+  });
+} else {
+  alert("Geolocation is not supported by this browser.");
+}
 
 var googleStreets = L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
   maxZoom: 20,
@@ -16,17 +29,24 @@ googleStreets.addTo(map);
 
 // Marker
 
-// var popup = marker.bindPopup("This is Ekbana").openPopup();
+var myIcon = L.icon({
+  iconUrl: "red_marker.png",
+  iconSize: [40, 40],
+});
 
 map.on("click", function (e) {
-  $("#lat").val(e.latlng.lat);
-  $("#long").val(e.latlng.lng);
-  var marker = L.marker([e.latlng.lat, e.latlng.lng]);
+  let lat = e.latlng.lat;
+  let long = e.latlng.lng;
+  $("#lat").val(lat);
+  $("#long").val(long);
+  //   let latlong = lat,long;
+  $("#latlong").val(lat + "," + long);
 
   if (currentMarker) {
     map.removeLayer(currentMarker);
   }
 
   currentMarker = L.marker(e.latlng);
+
   currentMarker.addTo(map);
 });
